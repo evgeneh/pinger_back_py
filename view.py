@@ -4,18 +4,17 @@ from models import Host, HostSchema
 
 from scheduling import th
 
-@app.route('/api/1.0//test')
-def index():
+@app.route('/api/1.0/test')
+def index():   
     
-    print(host)
     return 'ok'
 
 
 @app.route('/api/1.0/host', methods=['POST'])  
 def create_host():
     if request.methods == 'POST':
-        ip = request.form['ip']
-
+        ip = int(request.form['ip'])
+    
         try:
             host = Host.query.filter(Host.ip == ip).first()
             if host is not None:
@@ -33,19 +32,20 @@ def create_host():
 @app.route('/api/1.0/host/<hostid>', methods=['GET', 'DELETE'])  
 def return_host(hostid):     
     if request.method == 'GET':
-        try:        
-            host = Host.query.filter(Host.id == hostid).first()
+        try:  
+            id = int(hostid)    
+            host = Host.query.filter(Host.id == id).first()
             host_schema = HostSchema()
             host_data = host_schema.dump(host)
-            return jsonify({'success': True, "error": null, 'data': host_data})
+            return jsonify({'success': True, "error": 'null', 'data': host_data})
         except:
             error ='finding host error'
             return jsonify({'success': False, "error": error})
     elif request.method == 'DELETE':
         try:
             db.session.query(Host).filter(Host.id == hosid).delete()
-            db.session.commit
-            return jsonify({'success': True, "error": null, 'data': host_data})
+            db.session.commit()
+            return jsonify({'success': True, "error": 'null', 'data': host_data})
         except:
             return jsonify({'success': False, "error": 'Delete host error'})
 
@@ -53,16 +53,15 @@ def return_host(hostid):
 @app.route('/api/1.0/hosts', methods=['GET'])  
 def return_hosts_list(): 
     try:
-        hosts = Host.query.all()
-        host_schema = HostSchema(many=True)
-        hosts_list = host_schema.dump(hosts).data
-        return jsonify({'success': True, "error": null, 'data': host_data})
+
+        hosts = Host.query.all()     
+        host_schema = HostSchema(many=True)    
+        hosts_list = host_schema.dump(hosts)
+        print(hosts_list)
+
+        return jsonify({'success': True, "error": 'null', 'data': hosts_list})
     except:
         return jsonify({'success': False, "error": 'Get ip list error'})
 
 
-@app.route('/api/1.0/hosts', methods=['GET'])  
-def set_shedule(): 
-    th.st        
-    return jsonify({'success': True, "error": null, 'data': host_data})
     

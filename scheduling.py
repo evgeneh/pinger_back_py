@@ -46,8 +46,8 @@ def ping_job():
 
 def start_monitor(): 
     print("----")   
-    schedule.every(50).seconds.do(ping_job)
-    #schedule.every(5).minutes.do(ping_job)
+    #schedule.every(50).seconds.do(ping_job)
+    schedule.every(5).minutes.do(ping_job)
 
     while True:
         schedule.run_pending()
