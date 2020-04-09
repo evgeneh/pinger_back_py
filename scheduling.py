@@ -14,19 +14,16 @@ ilock = Lock()
 def base_update(ping_res):
     print(ping_res)
     for val in ping_res.data:
-        host = db.session.query(Host).filter(Host.ip == val.ip).first()
-        print(host.id)
-        if host is not None:
-            host.is_available = (int(val.per_loss) < 100 ) 
-            host.per_loss =  int(val.per_loss)
-            print(host.per_loss)
-            if host.is_available:
-                host.update(max_latency=float(val.max), min_latency=float(val.min), avg_latency=float(val.avg), jitter=float(val.jitter)) 
-                host.updated = datetime.now()
-            db.session.commit()
+        host_is_available = (int(val.per_loss) < 100 ) 
+        dtm_now = datetime.now()
+        host = {'is_available':host_is_available, 'per_loss':int(val.per_loss), 'updated':dtm_now}
+        if host_is_available:
+            host.update(max_latency=float(val.max), min_latency=float(val.min), avg_latency=float(val.avg), jitter=float(val.jitter)) 
+
+        db.session.query(Host).filter(Host.ip == val.ip).update(host) 
+        db.session.commit()
 
 def ping_job():
-
     host = Host.query.all()
     print(host[0].ip)
     host_array_data = []
@@ -43,9 +40,8 @@ def ping_job():
                 base_update(ping_res)
             
         
-
-def start_monitor(): 
-    print("----")   
+#update hosts data by schedule
+def start_monitor():   
     #schedule.every(50).seconds.do(ping_job)
     schedule.every(5).minutes.do(ping_job)
 
