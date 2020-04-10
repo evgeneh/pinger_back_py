@@ -13,7 +13,7 @@ def index():
 @app.route('/api/1.0/host', methods=['POST'])  
 def create_host():
     if request.methods == 'POST':
-        ip = int(request.form['ip'])
+        ip = (request.json['ip'])
     
         try:
             host = Host.query.filter(Host.ip == ip).first()
